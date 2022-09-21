@@ -1,9 +1,9 @@
 import express from 'express';
 import { userSignUp, userLogin } from '../controllers/userController';
 import { userSignupDetails } from '../interfaces/userData';
-import { Request, Response } from 'express';
+import { logRequest } from '../middlewares/requestLog';
 const router = express.Router();
-
+//router.use(logRequest);
 router.get('/', (req, res) => {
   res.send('Welcome to User Routes ');
 });

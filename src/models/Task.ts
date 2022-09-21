@@ -7,21 +7,29 @@ class Task extends Model {}
 Task.init(
   {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
       references: {
         model: User,
         key: 'id',
       },
     },
-    userId: { type: DataTypes.STRING },
-    details: { type: DataTypes.STRING, allowNull: false },
-    status: { type: DataTypes.STRING, defaultValue: 'NEW' },
+    description: { type: DataTypes.STRING, allowNull: false },
+    status: { type: DataTypes.INTEGER, defaultValue: 0 },
   },
   {
     sequelize: sequelize,
-    modelName: 'Task',
+    modelName: 'task',
+    tableName: 'Task',
   }
 );
 
 User.hasMany(Task, { foreignKey: 'userId' });
 Task.belongsTo(User, { foreignKey: 'userId' });
+
+export default Task;
