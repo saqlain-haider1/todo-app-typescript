@@ -22,6 +22,7 @@ app.use(logRequest);
 app.use(express.json());
 app.use('/user', userRoutes);
 app.use('/task', taskRoutes);
+// Start listening on the specified port
 app.listen(process.env.PORT, () => {
   console.log('Server listening on port ' + process.env.PORT);
 });

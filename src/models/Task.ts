@@ -2,6 +2,7 @@ import { Model, DataTypes } from 'sequelize';
 import sequelize from '../db/database';
 import User from './User';
 
+// Task model for storing tasks in database
 class Task extends Model {}
 
 Task.init(
@@ -24,6 +25,7 @@ Task.init(
   },
   {
     sequelize: sequelize,
+    paranoid: true,
     modelName: 'task',
     tableName: 'Task',
   }

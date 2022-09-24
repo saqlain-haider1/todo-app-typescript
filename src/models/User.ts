@@ -1,5 +1,7 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../db/database';
+
+// User model for storing user information in the database
 class User extends Model {}
 
 User.init(
@@ -14,9 +16,11 @@ User.init(
       },
     },
     password: { type: DataTypes.STRING, allowNull: false },
+    role: { type: DataTypes.STRING, allowNull: false, defaultValue: 'member' },
   },
   {
     sequelize,
+    paranoid: true,
     tableName: 'User',
     modelName: 'user',
   }

@@ -2,12 +2,17 @@ import bcrypt from 'bcrypt';
 import jwt, { Secret } from 'jsonwebtoken';
 import { userSignupDetails } from '../interfaces/userData';
 import User from '../models/User';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
-// Function to handle userSignUp
+/**
+ *
+ * @param req userSignupDetails
+ * @param res Response object
+ * @returns Promise< { message: string } >
+ */
 export const userSignUp = async (req: userSignupDetails, res: Response) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
     if (name && password && email) {
       // If user details is present in the request body
       const user = await User.findOne({ where: { email: email } });
@@ -21,6 +26,7 @@ export const userSignUp = async (req: userSignupDetails, res: Response) => {
           name,
           email,
           password: hashValue,
+          role,
         });
         newUser.save().then((user) => {
           console.log('Created User: ' + user);
@@ -38,7 +44,12 @@ export const userSignUp = async (req: userSignupDetails, res: Response) => {
   }
 };
 
-// Function to handle user login
+/**
+ *
+ * @param req : Partial<userSignupDetails>
+ * @param res : Response object
+ * @returns : Promise<{ message: string, token: JWTTOKEN  }>
+ */
 export const userLogin = async (
   req: Partial<userSignupDetails>,
   res: Response
@@ -74,6 +85,89 @@ export const userLogin = async (
       );
     } else {
       throw new Error('Email or Password is incorrect !');
+    }
+  } catch (err: any) {
+    return res.status(400).json({ error: err.message });
+  }
+};
+
+/**
+ *
+ * @param req : Request object
+ * @param res : Response object
+ * @returns : Promise { count: number, Users: User[] }
+ */
+export const getUsers = async (req: Request, res: Response) => {
+  try {
+    let { count, rows } = await User.findAndCountAll();
+    if (rows.length > 0) {
+      res.json({ count: count, Users: rows });
+    }
+  } catch (err: any) {
+    return res.status(400).json({ error: err.message });
+  }
+};
+/**
+ *
+ * @param req : Request object
+ * @param res : Response object
+ * @returns : Promise<User>
+ */
+export const changeRole = async (req: Request, res: Response) => {
+  try {
+    const userToChangeId = req?.body.userToChangeId;
+    const user = await User.findByPk(userToChangeId);
+    if (user) {
+      const newRole = user.toJSON().role === 'admin' ? 'member' : 'admin';
+      const updatedUser = await user.update({ role: newRole });
+      if (updatedUser) {
+        res.json(updatedUser);
+      }
+    } else {
+      throw new Error('User not found');
+    }
+  } catch (err: any) {
+    return res.status(400).json({ error: err.message });
+  }
+};
+
+/**
+ *
+ * @param req : Request object
+ * @param res : Response object
+ * @returns : Promise <string>
+ */
+export const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const userToDeleteId = req?.body.userToDeleteId;
+    const user = await User.findByPk(userToDeleteId);
+    if (user) {
+      user.destroy().then(() => {
+        res.json('User deleted');
+      });
+    } else {
+      throw new Error('User not found');
+    }
+  } catch (err: any) {
+    return res.status(400).json({ error: err.message });
+  }
+};
+
+/**
+ *
+ * @param req : Request object
+ * @param res : Response object
+ * @returns : Promise <string>
+ */
+export const restoreUser = async (req: Request, res: Response) => {
+  try {
+    const userToRestoreId = req?.body.userToRestoreId;
+    if (userToRestoreId) {
+      User.restore({ where: { id: userToRestoreId } }).then(() => {
+        res.json('User restored successfully');
+      });
+    } else {
+      throw new Error('User Id not found');
     }
   } catch (err: any) {
     return res.status(400).json({ error: err.message });

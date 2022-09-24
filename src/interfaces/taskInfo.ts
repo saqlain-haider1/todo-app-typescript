@@ -4,7 +4,7 @@ import { EnumType } from 'typescript';
 enum TaskStatus {
   NEW,
   INPROGRESS,
-  FINISHED,
+  DONE,
 }
 export interface TaskInfo extends Request {
   userId: number;
